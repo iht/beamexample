@@ -26,6 +26,8 @@ import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.transforms.Sum;
+import org.apache.beam.sdk.transforms.windowing.FixedWindows;
+import org.apache.beam.sdk.transforms.windowing.Window;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.TypeDescriptors;
@@ -74,11 +76,11 @@ public class Exercise3 {
           // WindowFn that assigns elements to windows of a fixed size. Use
           // these methods to apply fixed windows of size
           // this.duration to the PCollection.
-          .apply(new ChangeMe<>() /* TODO: YOUR CODE GOES HERE */)
+          .apply(Window.into(FixedWindows.of(duration)))
           // Remember the ExtractAndSumScore PTransform from Exercise 1? We
           // parameterized it over the KeyField. Use it here to compute the team
           // scores.
-          .apply(new ChangeMe<>() /* TODO: YOUR CODE GOES HERE */);
+          .apply("ExtractUserScore", new ExtractAndSumScore(KeyField.TEAM));
       // [END EXERCISE 3]
     }
   }

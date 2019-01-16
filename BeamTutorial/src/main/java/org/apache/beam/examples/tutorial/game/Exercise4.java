@@ -27,9 +27,7 @@ import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.transforms.Sum;
-import org.apache.beam.sdk.transforms.windowing.AfterWatermark;
-import org.apache.beam.sdk.transforms.windowing.FixedWindows;
-import org.apache.beam.sdk.transforms.windowing.Window;
+import org.apache.beam.sdk.transforms.windowing.*;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.TypeDescriptors;
@@ -100,11 +98,11 @@ public class Exercise4 {
               // Since we want a globally increasing sum, use the GlobalWindows
               // WindowFn
               .<GameActionInfo>into(
-                  new ChangeMeWindowFN<>() /* TODO: YOUR CODE GOES HERE */)
+                      new GlobalWindows())
               // We want periodic results every updateFrequency of processing
               // time. We will be triggering repeatedly and forever, starting
               // updateFrequency after the first element seen. Window.
-              .triggering(null /* TODO: YOUR CODE GOES HERE */)
+              .triggering(Repeatedly.)
               // Specify the accumulation mode to ensure that each firing of the
               // trigger produces monotonically increasing sums rather than just
               // deltas.
@@ -119,7 +117,7 @@ public class Exercise4 {
           // Extract and sum username/score pairs from the event data.
           // You can use the ExtractAndSumScore transform again.
           // Name the step -- look at overloads of apply().
-          .apply(new ChangeMe<>() /* TODO: YOUR CODE GOES HERE */);
+          .apply("Extract and sum score", new ExtractAndSumScore(KeyField.USER));
       // [END EXERCISE 4 Part 1]
     }
   }
@@ -155,7 +153,7 @@ public class Exercise4 {
           Window.<GameActionInfo>into(FixedWindows.of(windowSize)).triggering(AfterWatermark.pastEndOfWindow()
           // Specify .withEarlyFirings to produce speculative results with a
           // delay of earlyUpdateFrequency
-          /* TODO: YOUR CODE GOES HERE */
+                  /* TODO: YOUR CODE GOES HERE */
           // Specify .withLateFirings to produce late updates with a delay of
           // lateUpdateFrequency
           /* TODO: YOUR CODE GOES HERE */

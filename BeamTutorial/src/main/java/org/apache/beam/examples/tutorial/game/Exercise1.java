@@ -23,8 +23,7 @@ import org.apache.beam.examples.tutorial.game.utils.Input;
 import org.apache.beam.examples.tutorial.game.utils.Output;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.MapElements;
-import org.apache.beam.sdk.transforms.PTransform;
+import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.TypeDescriptors;
@@ -79,7 +78,6 @@ public class Exercise1 {
 
     @Override
     public PCollection<KV<String, Integer>> expand(PCollection<GameActionInfo> gameInfo) {
-
       // [START EXERCISE 1]:
       // JavaDoc: https://cloud.google.com/dataflow/java-sdk/JavaDoc
       // Developer Docs: https://cloud.google.com/dataflow/model/par-do
@@ -99,10 +97,28 @@ public class Exercise1 {
         // We declare the output type explicitly using withOutputType.
         // Use the following code to add the output type:
         //.withOutputType(TypeDescriptors.kvs(TypeDescriptors.strings(), TypeDescriptors.integers()))
-        .apply(new ChangeMe<>() /* TODO: YOUR CODE GOES HERE */)
+        /*.apply(ParDo.of (
+                new DoFn<GameActionInfo, KV<String, Integer>>() {
+                  @DoFn.ProcessElement
+                  public void processElement(ProcessContext c) {
+                    GameActionInfo g = c.element();
+                    String key = field.extract(g);
+                    Integer value = g.getScore();
+                    c.output(KV.of(key, value));
+                  }
+                }
+        ))*/
+        .apply(MapElements
+                .into(TypeDescriptors.kvs(TypeDescriptors.strings(), TypeDescriptors.integers()))
+                .via((GameActionInfo g) -> {
+                  String key = field.extract(g);
+                  Integer value = g.getScore();
+                  return KV.of(key, value);
+                })
+                )
         // Sum is a family of PTransforms for computing the sum of elements in a PCollection.
         // Select the appropriate method to compute the sum over each key.
-        .apply(new ChangeMe<>() /* TODO: YOUR CODE GOES HERE */);
+        .apply(Sum.integersPerKey());
       // [END EXERCISE 1]:
     }
   }
