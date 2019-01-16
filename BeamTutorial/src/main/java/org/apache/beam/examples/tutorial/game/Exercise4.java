@@ -102,7 +102,7 @@ public class Exercise4 {
               // We want periodic results every updateFrequency of processing
               // time. We will be triggering repeatedly and forever, starting
               // updateFrequency after the first element seen. Window.
-              .triggering(Repeatedly.)
+              .triggering(Repeatedly.forever(AfterProcessingTime.pastFirstElementInPane().plusDelayOf(updateFrequency)))
               // Specify the accumulation mode to ensure that each firing of the
               // trigger produces monotonically increasing sums rather than just
               // deltas.
@@ -153,10 +153,10 @@ public class Exercise4 {
           Window.<GameActionInfo>into(FixedWindows.of(windowSize)).triggering(AfterWatermark.pastEndOfWindow()
           // Specify .withEarlyFirings to produce speculative results with a
           // delay of earlyUpdateFrequency
-                  /* TODO: YOUR CODE GOES HERE */
+          .withEarlyFirings(AfterProcessingTime.pastFirstElementInPane().plusDelayOf(earlyUpdateFrequency))
           // Specify .withLateFirings to produce late updates with a delay of
           // lateUpdateFrequency
-          /* TODO: YOUR CODE GOES HERE */
+          .withLateFirings(AfterProcessingTime.pastFirstElementInPane().plusDelayOf(lateUpdateFrequency))
           // Specify allowed lateness, and ensure that we get cumulative results
           // across the window.
           ).withAllowedLateness(allowedLateness).accumulatingFiredPanes())
@@ -190,10 +190,10 @@ public class Exercise4 {
     }
   }
 
-  private static final Duration ALLOWED_LATENESS = Duration.standardMinutes(30);
-  private static final Duration EARLY_UPDATE_FREQUENCY = Duration.standardMinutes(1);
-  private static final Duration LATE_UPDATE_FREQUENCY = Duration.standardMinutes(2);
-  private static final Duration WINDOW_SIZE = Duration.standardMinutes(5);
+  private static final Duration ALLOWED_LATENESS = Duration.standardMinutes(1);
+  private static final Duration EARLY_UPDATE_FREQUENCY = Duration.standardSeconds(30);
+  private static final Duration LATE_UPDATE_FREQUENCY = Duration.standardSeconds(30);
+  private static final Duration WINDOW_SIZE = Duration.standardMinutes(1);
 
   public static void main(String[] args) throws Exception {
     ExerciseOptions options = PipelineOptionsFactory.fromArgs(args).withValidation().as(ExerciseOptions.class);
